@@ -3,7 +3,7 @@ ip_carp-objs	:= carp.o carp_log.o carp_queue.o carp_debugfs.o carp_procfs.o carp
 
 CC := colorgcc
 
-KDIR	:= /usr/src/linux-headers-$(shell uname -r)
+KDIR	:= /usr/src/linux-$(shell uname -r)
 PWD	:= $(shell pwd)
 CONFIG_CARP_DEBUG=1
 

@@ -81,7 +81,6 @@ static const struct class_attribute class_attr_carp = {
     },
     .show  = carp_show_carps,
     .store = carp_store_carps,
-    .namespace = carp_namespace,
 };
 
 static ssize_t carp_show_adv_base(struct device *dev,
@@ -230,11 +229,11 @@ static ssize_t carp_store_state(struct device *dev,
         goto out;
     }
 
-    if (strnicmp(new_state_name, "MASTER", 7) == 0) {
+    if (strncasecmp(new_state_name, "MASTER", 7) == 0) {
         new_state = MASTER;
-    } else if (strnicmp(new_state_name, "BACKUP", 7) == 0) {
+    } else if (strncasecmp(new_state_name, "BACKUP", 7) == 0) {
         new_state = BACKUP;
-    } else if (strnicmp(new_state_name, "INIT", 4) == 0) {
+    } else if (strncasecmp(new_state_name, "INIT", 4) == 0) {
         new_state = INIT;
     } else {
         pr_err("%s: invalid state specified.\n", carp->name);

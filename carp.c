@@ -54,7 +54,7 @@
 #include <net/net_namespace.h>
 #include <net/netns/generic.h>
 
-#include <asm/scatterlist.h>
+#include <linux/scatterlist.h>
 
 #ifdef CONFIG_IPV6
 #include <net/ipv6.h>
@@ -514,7 +514,7 @@ static void carp_dev_setup(struct net_device *carp_dev)
     carp_dev->hard_header_len = LL_MAX_HEADER;
     carp_dev->mtu             = 1500;
     carp_dev->flags           = IFF_NOARP;
-    carp_dev->iflink          = 0;
+//    carp_dev->iflink          = 0;
     carp_dev->addr_len        = 4;
 
     /* Initialise carp options */
@@ -675,7 +675,8 @@ static struct rtnl_link_ops carp_link_ops __read_mostly = {
     .priv_size     = sizeof(struct carp),
     .setup         = carp_dev_setup,
     .validate      = carp_validate,
-    .get_tx_queues = carp_get_tx_queues,
+    .get_num_tx_queues = carp_get_tx_queues,
+    .get_num_rx_queues = carp_get_tx_queues,
 };
 
 int carp_create(struct net *net, const char *name)
@@ -687,7 +688,7 @@ int carp_create(struct net *net, const char *name)
     rtnl_lock();
 
     carp_dev = alloc_netdev_mq(sizeof(struct carp),
-                               name ? name : "carp%d",
+                               name ? name : "carp%d",NET_NAME_UNKNOWN,
                                carp_dev_setup, carp_tx_queues);
     if (!carp_dev) {
         pr_err("%s: eek! can't alloc netdev!\n", name);

@@ -96,8 +96,7 @@ static int carp_info_open(struct inode *inode, struct file *file)
     if (!res) {
         /* recover the pointer buried in proc_dir_entry data */
         seq = file->private_data;
-        proc = PDE(inode);
-        seq->private = proc->data;
+        seq->private = PDE_DATA(inode);
     }
 
     return res;

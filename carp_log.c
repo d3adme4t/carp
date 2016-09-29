@@ -36,7 +36,7 @@
 #include <net/protocol.h>
 #include <net/arp.h>
 
-#include <asm/scatterlist.h>
+#include <linux/scatterlist.h>
 #include <asm/delay.h>
 
 #include "carp.h"
