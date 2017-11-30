@@ -41,6 +41,7 @@
 #include <linux/igmp.h>
 #include <linux/netfilter_ipv4.h>
 #include <linux/crypto.h>
+#include <crypto/hash.h>
 #include <linux/random.h>
 
 #include <net/route.h>
@@ -132,7 +133,7 @@ static void carp_dev_uninit(struct net_device *dev)
 
     carp_del_all_timeouts(carp);
     carp_remove_proc_entry(carp);
-    crypto_free_hash(carp->hash);
+    crypto_free_ahash(carp->hash);
     list_del(&(cn_global->dev_list));
 
     if (carp->odev)
@@ -504,9 +505,11 @@ static void carp_dev_setup(struct net_device *carp_dev)
     carp_dbg("%s\n", __func__);
 
     /* Initialise the device entry points */
+    carp_dev->max_mtu = ETH_MAX_MTU;
     carp_dev->netdev_ops = &carp_netdev_ops;
 
-    carp_dev->destructor = free_netdev;
+    carp_dev->needs_free_netdev = true;
+    carp_dev->priv_destructor = free_netdev;
 
     // FIXME: what happened to the owner field?
     //carp_dev->owner = THIS_MODULE;
@@ -543,7 +546,7 @@ static void carp_dev_setup(struct net_device *carp_dev)
     carp->adv_timer.data     = (unsigned long)carp;
     carp->adv_timer.function = carp_advertise;
 
-    carp->hash = crypto_alloc_hash("hmac(sha1)", 0, CRYPTO_ALG_ASYNC);
+    carp->hash = crypto_alloc_ahash("hmac(sha1)", 0, CRYPTO_ALG_ASYNC);
     if (!carp->hash) {
         pr_err("Failed to allocate SHA1 hash.\n");
         res = -EINVAL;
@@ -557,7 +560,7 @@ static void carp_dev_setup(struct net_device *carp_dev)
     return;
 
 err_out_crypto_free:
-    crypto_free_hash(carp->hash);
+    crypto_free_ahash(carp->hash);
 out:
     return;
 }

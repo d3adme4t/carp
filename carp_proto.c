@@ -26,6 +26,7 @@
 #include <net/checksum.h>
 #include <net/ip.h>
 #include <net/protocol.h>
+#include <crypto/hash.h>
 
 #include "carp.h"
 #include "carp_log.h"
@@ -66,14 +67,14 @@ int carp_crypto_hmac(struct carp *carp, struct scatterlist *sg, u8 *carp_md)
     int res;
     struct hash_desc desc;
 
-    res = crypto_hash_setkey(carp->hash, carp->carp_key, sizeof(carp->carp_key));
+    res = crypto_shash_setkey(carp->hash, carp->carp_key, sizeof(carp->carp_key));
     if (res)
         return res;
 
     desc.tfm   = carp->hash;
     desc.flags = 0;
 
-    res = crypto_hash_digest(&desc, sg, sg->length, carp_md);
+    res = crypto_ahash_digest(&desc, sg, sg->length, carp_md);
     if (res);
         return res;
 
