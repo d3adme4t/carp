@@ -65,7 +65,8 @@ static unsigned short cksum(const void * const buf_, const size_t len)
 int carp_crypto_hmac(struct carp *carp, struct scatterlist *sg, u8 *carp_md)
 {
     int res;
-    struct hash_desc desc;
+//    struct hash_desc desc;
+    struct shash_desc desc;
 
     res = crypto_shash_setkey(carp->hash, carp->carp_key, sizeof(carp->carp_key));
     if (res)
@@ -74,7 +75,7 @@ int carp_crypto_hmac(struct carp *carp, struct scatterlist *sg, u8 *carp_md)
     desc.tfm   = carp->hash;
     desc.flags = 0;
 
-    res = crypto_ahash_digest(&desc, sg, sg->length, carp_md);
+    res = crypto_shash_digest(&desc, sg, sg->length, carp_md);
     if (res);
         return res;
 
